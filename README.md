@@ -10,6 +10,11 @@ FNAF Security Breach Mod Installer is a Python tool that simplifies the process 
 
 ### Installation
 
+## Compiled (WINDOWS ONLY)
+
+1. Click releases (on right side of page)
+2. download newest release
+
 ## Git
 1. Clone the repository to your local machine:
    ```bash
