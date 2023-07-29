@@ -1,30 +1,28 @@
 import shutil
 import os
 import sys
+import colorama
 
 
 class Colors:
-    red = '\033[91m'
-    green = '\033[92m'
-    yellow = '\033[93m'
-    blue = '\033[94m'
-    reset = '\033[0m'
+    def __init__(self):
+        colorama.init()
 
     def success(self, msg, end="\n"):
-        print(f"[{self.green}+{self.reset}] {msg}", end=end)
+        print(f"[{colorama.Fore.GREEN}+{colorama.Fore.RESET}] {msg}", end=end)
 
     def error(self, msg, end="\n"):
-        print(f"[{self.red}-{self.reset}] {msg}", end=end)
+        print(f"[{colorama.Fore.RED}-{colorama.Fore.RESET}] {msg}", end=end)
 
     def info(self, msg, end="\n"):
-        print(f"[{self.yellow}?{self.reset}] {msg}", end=end)
+        print(f"[{colorama.Fore.YELLOW}?{colorama.Fore.RESET}] {msg}", end=end)
 
 
 class Modder:
     def __init__(self):
         self.c = Colors()
-        print(f"{self.c.green}--- FNAF Security Breach Mod Installer ---{self.c.reset}")
-        print(f"Discord: {self.c.blue}https://discord.gg/nQfqAUw8TJ{self.c.reset}")
+        print(f"{colorama.Fore.GREEN}--- FNAF Security Breach Mod Installer ---{colorama.Fore.RESET}")
+        print(f"Discord: {colorama.Fore.BLUE}https://discord.gg/nQfqAUw8TJ{colorama.Fore.RESET}")
         print("")
 
         self.find_fnaf_files()
@@ -72,10 +70,10 @@ class Modder:
 
         print("Please select a mod file to install")
         for i, mod in enumerate(mod_files):
-            print(f"[{self.c.blue}{i + 1}{self.c.reset}] {mod}")
+            print(f"[{colorama.Fore.BLUE}{i + 1}{colorama.Fore.RESET}] {mod}")
 
-        print(f"[{self.c.blue}{i + 2}{self.c.reset}] Install all mods")
-        print(f"[{self.c.blue}{i + 3}{self.c.reset}] Exit")
+        print(f"[{colorama.Fore.BLUE}{i + 2}{colorama.Fore.RESET}] Install all mods")
+        print(f"[{colorama.Fore.BLUE}{i + 3}{colorama.Fore.RESET}] Exit")
 
         upper_bound = i + 3
 
@@ -135,3 +133,5 @@ class Modder:
 
 if __name__ == "__main__":
     modder = Modder()
+
+    input("Press enter to exit...")
