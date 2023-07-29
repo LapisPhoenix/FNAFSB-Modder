@@ -111,7 +111,8 @@ class Modder:
     def install_mod(self, mod, paks_dir, mod_dir):
         # Install the mod
         mod_name = os.path.basename(mod)
-        mod_name_final = mod_name.replace(" ", "").replace(".pak", "_P.pak")
+        mod_name_final = mod_name.replace(" ", "")
+        mod_name_final = mod_name_final.replace(".pak", "_P.pak") if not mod_name_final.endswith("_P.pak") else mod_name_final
 
         self.c.info(f"Installing {mod_name}...")
         final_dest = os.path.join(paks_dir, mod_name)
