@@ -20,33 +20,42 @@ FNAF Security Breach Mod Installer is a Python tool that simplifies the process 
    ```bash
    git clone https://github.com/lapisphoenix/fnafsb-modder.git
    ```
+2. CD into your newly created folder
+   ```bash
+   cd fnafsb-modder
+   ```
+3. Run the following command
+   ```bash
+   python -m pip install -r requirements.txt
+   ```
+
 
 ## Manual
 1. Click on the `<> Code` Button above the file list
 2. Click on the `Download Zip` Button
 3. Navigate to where it has been downloaded
 4. Unzip Folder
+5. Run the following command
+   ```bash
+   python -m pip install -r requirements.txt
+   ```
 
 
 ### Usage
 
 ## Source
-1. CD into your newly created folder
-   ```bash
-   cd fnafsb-modder
-   ```
-2. Run the Python file
+1. Run the Python file
    ```bash
    python main.py
    ```
-3. Follow directions in the program
+2. Follow directions in the program
 
 ## Compiled
 1. Run `main.exe`
 
 ### Note
 - Make sure to keep a backup of your original game files before installing any mods. Mods may cause unexpected behavior and can potentially corrupt your game data.
-- The script doesn't have any external dependencies and should work on both Windows and Linux without additional installations.
+- The script should work on both linux and windows
 
 
 ### License
