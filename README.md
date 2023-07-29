@@ -30,6 +30,7 @@ FNAF Security Breach Mod Installer is a Python tool that simplifies the process 
 
 ### Usage
 
+## Source
 1. CD into your newly created folder
    ```bash
    cd fnafsb-modder
@@ -40,6 +41,8 @@ FNAF Security Breach Mod Installer is a Python tool that simplifies the process 
    ```
 3. Follow directions in the program
 
+## Compiled
+1. Run `main.exe`
 
 ### Note
 - Make sure to keep a backup of your original game files before installing any mods. Mods may cause unexpected behavior and can potentially corrupt your game data.
