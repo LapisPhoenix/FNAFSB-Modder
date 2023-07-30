@@ -1,3 +1,5 @@
+![Banner](https://raw.githubusercontent.com/LapisPhoenix/FNAFSB-Modder/main/Banner.png)
+
 # FNAF Security Breach Unverum Patcher
 
 ![GitHub](https://img.shields.io/github/license/lapisphoenix/fnafsb-modder)
