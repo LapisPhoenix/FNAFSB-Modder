@@ -1,7 +1,12 @@
 import shutil
 import os
 import sys
+import time
+import subprocess
 import colorama
+import requests
+import patoolib
+from tqdm import tqdm
 
 
 class Colors:
@@ -15,123 +20,170 @@ class Colors:
         print(f"[{colorama.Fore.RED}-{colorama.Fore.RESET}] {msg}", end=end)
 
     def info(self, msg, end="\n"):
-        print(f"[{colorama.Fore.YELLOW}?{colorama.Fore.RESET}] {msg}", end=end)
+        print(f"[{colorama.Fore.YELLOW}!{colorama.Fore.RESET}] {msg}", end=end)
 
 
-class Modder:
+class Patcher:
     def __init__(self):
         self.c = Colors()
-        print(f"{colorama.Fore.GREEN}--- FNAF Security Breach Mod Installer ---{colorama.Fore.RESET}")
+        print(f"{colorama.Fore.GREEN}--- FNAF Security Breach Unverum Patcher ---{colorama.Fore.RESET}")
         print(f"Discord: {colorama.Fore.BLUE}https://discord.gg/nQfqAUw8TJ{colorama.Fore.RESET}")
         print("")
 
-        self.find_fnaf_files()
+        self.main()
 
-    def find_fnaf_files(self):
-        # Default fnaf directory
-        system = sys.platform
-        game_dir = None
-
-        if system == "win32":
-            steam_directory = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Quarters\\fnaf9"
-        else:
-            steam_directory = "/home/user/.steam/steam/steamapps/common/Quarters/fnaf9"
-
-        if not os.path.exists(steam_directory):
-            self.c.error(f"Could not find Security Breach directory. Please enter it manually.")
-            self.c.info(f"Example: {steam_directory}")
-            self.c.info(f"Enter the directory: ", end="")
-            game_dir = input()
-
-            if not game_dir.endswith("fnaf9"):
-                game_dir = os.path.join(game_dir, "fnaf9")
-
-            if not os.path.exists(game_dir):
-                self.c.error(f"Could not find Security Breach directory. Exiting...")
-                exit()
-
-        self.c.success(f"Found Security Breach directory at {game_dir}")
-        paks_dir = os.path.join(game_dir, "Content", "Paks")
-
-        # Now we need the directory of the mod files
-        print("")
-        self.c.info(f"Enter the directory of the mod files: ", end="")
-        mod_dir = input()
-
-        if not os.path.exists(mod_dir):
-            self.c.error(f"Mod directory is either invalid or does not exist. Exiting...")
-            exit()
-
-        mod_files = [file for file in os.listdir(mod_dir) if file.endswith(".pak")]
-
-        if len(mod_files) == 0:
-            self.c.error(f"No mod files found. Exiting...")
-            exit()
-
-        print("Please select a mod file to install")
-        for i, mod in enumerate(mod_files):
-            print(f"[{colorama.Fore.BLUE}{i + 1}{colorama.Fore.RESET}] {mod}")
-
-        print(f"[{colorama.Fore.BLUE}{i + 2}{colorama.Fore.RESET}] Install all mods")
-        print(f"[{colorama.Fore.BLUE}{i + 3}{colorama.Fore.RESET}] Exit")
-
-        upper_bound = i + 3
+    def menu(self):
+        print(f"[{colorama.Fore.BLUE}1{colorama.Fore.RESET}] Install + Patch Unverum")
+        print(f"[{colorama.Fore.BLUE}2{colorama.Fore.RESET}] Patch Unverum")
+        print(f"[{colorama.Fore.BLUE}3{colorama.Fore.RESET}] Install Unverum")
+        print(f"[{colorama.Fore.BLUE}4{colorama.Fore.RESET}] Exit")
 
         action = input(">> ")
+
         try:
             action = int(action)
         except ValueError:
-            self.c.error(f"Invalid option. Exiting...")
-            exit()
+            self.c.error("Invalid input.")
+            return self.menu()
 
-        if action > upper_bound or action < 1:
-            self.c.error(f"Invalid option. Exiting...")
-            exit()
+        return action
 
-        print("")
+    def main(self):
+        system = sys.platform
+        if not system == "win32":
+            self.c.error("This program only works on Windows.")
+            sys.exit(1)
 
-        if action == i + 2:
-            # Install all mods
-            for mod in mod_files:
-                self.install_mod(mod, paks_dir, mod_dir)
-        elif action == i + 3:
-            # Exit
-            exit()
-        else:
-            # Install one mod
-            mod = mod_files[action - 1]
-            mod = os.path.join(mod_dir, mod)
-            self.install_mod(mod, paks_dir, mod_dir)
+        try:
+            action = self.menu()
 
-        print("Your mod has now been installed. If you run into an error while in the game, the mod is most likely outdated.")
-        print("Enjoy!")
+            if action == 1:
+                # Install + Patch Unverum
+                self.install_unverum_with_patch()
+                self.c.success("Successfully installed and patched Unverum.")
+            elif action == 2:
+                # Patch Unverum
+                self.patch_unverum()
+                self.c.success("Successfully patched Unverum.")
+            elif action == 3:
+                # Install Unverum
+                self.install_unverum()
+                self.c.success("Successfully installed Unverum.")
+            elif action == 4:
+                # Exit
+                sys.exit(0)
+            else:
+                self.c.error("Invalid menu option. Please select a valid option.")
+        except Exception as e:
+            self.c.error(f"An unexpected error occurred: {str(e)}")
+            sys.exit(1)
 
-    def install_mod(self, mod, paks_dir, mod_dir):
-        # Install the mod
-        mod_name = os.path.basename(mod)
-        mod_name_final = mod_name.replace(" ", "")
-        mod_name_final = mod_name_final.replace(".pak", "_P.pak") if not mod_name_final.endswith("_P.pak") else mod_name_final
+        self.c.success("Done.")
 
-        self.c.info(f"Installing {mod_name}...")
-        final_dest = os.path.join(paks_dir, mod_name)
+    def install_unverum_with_patch(self):
+        try:
+            self.install_unverum()
+            self.patch_unverum()
+        except Exception as e:
+            self.c.error(f"Error while installing and patching Unverum: {str(e)}")
+            sys.exit(1)
 
-        if os.path.exists(final_dest):
-            self.c.info(f"{mod_name} already exists in the Paks directory.")
-            exit()
-        elif os.path.exists(os.path.join(paks_dir, mod_name_final)):
-            self.c.info(f"{mod_name_final} already exists in the Paks directory.")
-            return
-        else:
-            mod_path = os.path.join(mod_dir, mod)
-            shutil.copy(mod_path, final_dest)
+    def install_unverum(self):
+        try:
+            self.c.info("Installing Unverum...")
+            url = "https://gamebanana.com/dl/718209"
+            file_name = "unverum_160.rar"
 
-        # Rename file
-        os.rename(final_dest, os.path.join(paks_dir, mod_name_final))
-        print("")
-        self.c.success(f"Successfully installed {mod_name_final}!")
+            t0 = time.time()
+            resp = requests.get(url, stream=True)
+            total = int(resp.headers.get("content-length", 0))
+            with open(file_name, "wb") as file, tqdm(
+                desc=file_name,
+                total=total,
+                unit="iB",
+                unit_scale=True,
+                unit_divisor=1024,
+            ) as bar:
+                for data in resp.iter_content(chunk_size=1024):
+                    size = file.write(data)
+                    bar.update(size)
+
+            t1 = time.time()
+
+            self.c.success(f"Downloaded Unverum in {round(t1 - t0, 2)} seconds.")
+
+            t0 = time.time()
+            self.c.info("Extracting Unverum...")
+            time.sleep(1)
+            try:
+                self.extract_rar_archive(file_name, "unverum")
+            except Exception as e:
+                # Directory doesnt exist
+                os.mkdir("unverum")
+                self.extract_rar_archive(file_name, "unverum")
+            t1 = time.time()
+
+            self.c.success(f"Extracted Unverum in {round(t1 - t0, 2)} seconds.")
+            os.remove(file_name)
+            self.c.success("Done.")
+        except Exception as e:
+            self.c.error(f"Error while installing Unverum: {str(e)}")
+            sys.exit(1)
+
+    def extract_rar_archive(self, archive_file, target_folder):
+        try:
+            patoolib.extract_archive(archive_file, outdir=target_folder)
+        except Exception as e:
+            self.c.error(f"Error while extracting archive: {str(e)}")
+            sys.exit(1)
+
+    def patch_unverum(self):
+        # Check if .NET 5.0 Runtime is installed
+        try:
+            if shutil.which("dotnet"):
+                self.c.success(".NET 5.0 Runtime is already installed.")
+                return
+
+            self.c.info("Patching Unverum...")
+            self.c.info("Download .NET 5.0 Runtime...")
+
+            url = f"https://download.visualstudio.microsoft.com/download/pr/14ccbee3-e812-4068-af47-1631444310d1/3b8da657b99d28f1ae754294c9a8f426/dotnet-sdk-5.0.408-win-x64.exe"
+            file_name = "dotnet-sdk-5.0.408-win-x64.exe"
+            install_command = [file_name, "/install", "/quiet", "/norestart"]
+
+            t1 = time.time()
+            resp = requests.get(url, stream=True)
+            total = int(resp.headers.get("content-length", 0))
+            with open(file_name, "wb") as file, tqdm(
+                desc=file_name,
+                total=total,
+                unit="iB",
+                unit_scale=True,
+                unit_divisor=1024,
+            ) as bar:
+                for data in resp.iter_content(chunk_size=1024):
+                    size = file.write(data)
+                    bar.update(size)
+
+            t2 = time.time()
+
+            self.c.success(f"Downloaded .NET 5.0 Runtime in {round(t2 - t1, 2)} seconds.")
+            self.c.info("Installing .NET 5.0 Runtime...")
+
+            t1 = time.time()
+            subprocess.run(install_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+
+            os.remove(file_name)
+
+            t2 = time.time()
+
+            self.c.success(f"Installed .NET 5.0 Runtime in {round(t2 - t1, 2)} seconds.")
+        except Exception as e:
+            self.c.error(f"Error while patching Unverum: {str(e)}")
+            sys.exit(1)
 
 
 if __name__ == "__main__":
-    modder = Modder()
+    Patcher()
 
     input("Press enter to exit...")
